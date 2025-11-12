@@ -5,6 +5,7 @@ FastAPI 主應用程式
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import projects, activities, optimization
+import os
 
 # 建立 FastAPI 應用程式實例
 app = FastAPI(
@@ -13,10 +14,18 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# 從環境變數讀取允許的前端來源
+# 支援多個來源，用逗號分隔
+frontend_urls = os.getenv("FRONTEND_URL", "http://localhost:5173")
+allowed_origins = [url.strip() for url in frontend_urls.split(",")]
+# 開發環境也允許 localhost
+if "http://localhost:5173" not in allowed_origins:
+    allowed_origins.append("http://localhost:5173")
+
 # 設定 CORS 中間件，允許前端跨域請求
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 生產環境應設定具體的來源
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
