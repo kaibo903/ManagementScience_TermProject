@@ -45,7 +45,12 @@
         <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
             <div class="action-buttons">
-              <el-button size="small" @click="viewActivities(row)" class="action-btn manage-btn">
+              <el-button 
+                size="small" 
+                @click="viewActivities(row)" 
+                class="action-btn manage-btn"
+                plain
+              >
                 管理作業
               </el-button>
               <el-button size="small" type="primary" @click="editProject(row)" :icon="Edit" text class="action-btn icon-btn" />
@@ -266,6 +271,8 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  padding: var(--spacing-3xl);
+  background-color: var(--content-bg);
 }
 
 .breadcrumb {
@@ -281,7 +288,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   letter-spacing: 0;
@@ -289,12 +296,12 @@ onMounted(() => {
   margin: 0;
 }
 
-/* 無印風格卡片 */
+/* 統一卡片樣式 */
 .project-management :deep(.el-card) {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
 }
 
 .project-management :deep(.el-card__header) {
@@ -307,34 +314,35 @@ onMounted(() => {
   padding: var(--spacing-3xl);
 }
 
-/* 表格樣式 - 無印風格 */
+/* 統一表格樣式 */
 .project-management :deep(.project-table) {
   background-color: var(--card-bg);
   border-radius: 0;
-  border: 1px solid var(--border-color);
+  border: none;
   overflow: hidden;
 }
 
 .project-management :deep(.project-table .el-table__header-wrapper) {
-  background-color: var(--content-bg);
+  background-color: #F9FAFB;
 }
 
 .project-management :deep(.project-table th) {
-  background-color: var(--content-bg);
+  background-color: #F9FAFB;
   color: var(--text-primary);
-  font-weight: 400;
-  font-size: 14px;
-  border-bottom: 1px solid var(--border-color);
-  padding: 16px 14px;
-  letter-spacing: 0.01em;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  border-bottom: 2px solid var(--border-color);
+  padding: var(--spacing-lg) var(--spacing-md);
+  letter-spacing: 0;
 }
 
 .project-management :deep(.project-table td) {
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-size-md);
   border-bottom: 1px solid var(--border-light);
-  padding: 16px 14px;
+  padding: var(--spacing-lg) var(--spacing-md);
   line-height: 1.6;
+  background-color: var(--card-bg);
 }
 
 .project-management :deep(.el-table td .el-tag) {
@@ -365,11 +373,11 @@ onMounted(() => {
   line-height: 1.4;
 }
 
-/* 統一狀態標籤樣式 */
+/* 統一狀態標籤樣式 - 無印風格配色 */
 .project-management :deep(.status-tag.status-draft),
 .project-management :deep(.status-tag[class*="draft"]) {
   border-color: var(--text-light) !important;
-  background-color: #F3F4F6 !important;
+  background-color: #F5F5F5 !important;
   color: var(--text-secondary) !important;
   border-radius: var(--radius-sm) !important;
   font-weight: var(--font-weight-medium) !important;
@@ -377,22 +385,24 @@ onMounted(() => {
   padding: 4px 12px !important;
 }
 
+/* 進行中 - 使用無印紅色系（原已完成顏色） */
 .project-management :deep(.status-tag.status-active),
 .project-management :deep(.status-tag[class*="active"]) {
-  border-color: var(--success) !important;
-  background-color: #D1FAE5 !important;
-  color: #065F46 !important;
+  border-color: #C85A4F !important;
+  background-color: #F5E8E6 !important;
+  color: #8B3A2F !important;
   border-radius: var(--radius-sm) !important;
   font-weight: var(--font-weight-medium) !important;
   font-size: var(--font-size-sm) !important;
   padding: 4px 12px !important;
 }
 
+/* 已完成 - 使用柔和綠色系（原進行中顏色） */
 .project-management :deep(.status-tag.status-completed),
 .project-management :deep(.status-tag[class*="completed"]) {
-  border-color: #3B82F6 !important;
-  background-color: #DBEAFE !important;
-  color: #1E40AF !important;
+  border-color: #7A9B7A !important;
+  background-color: #E8F0E8 !important;
+  color: #4A6B4A !important;
   border-radius: var(--radius-sm) !important;
   font-weight: var(--font-weight-medium) !important;
   font-size: var(--font-size-sm) !important;
@@ -413,15 +423,16 @@ onMounted(() => {
 
 /* 按鈕樣式 */
 .project-management :deep(.el-button) {
-  border-radius: 0;
-  font-weight: 400;
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-normal);
+  transition: all 0.2s ease;
 }
 
 .project-management :deep(.el-button--small) {
   padding: 8px 16px;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  transition: all 0.25s ease;
+  font-size: var(--font-size-md);
+  letter-spacing: 0;
+  transition: all 0.2s ease;
   white-space: nowrap;
   height: 32px;
 }
@@ -429,18 +440,35 @@ onMounted(() => {
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-xs);
   flex-wrap: nowrap;
+}
+
+/* 編輯和刪除按鈕之間更緊密 */
+.action-buttons .icon-btn {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .action-btn {
   flex-shrink: 0;
 }
 
+/* 管理作業按鈕 - 統一為無底色樣式 */
 .manage-btn {
   min-width: 90px;
+  background-color: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
+.manage-btn:hover {
+  background-color: var(--content-bg) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+/* 編輯和刪除按鈕 - 無底色、無邊框、灰色圖示 */
 .icon-btn {
   padding: 6px !important;
   min-width: 32px;
@@ -449,6 +477,34 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+/* 編輯按鈕 - 透明背景、透明邊框、灰色圖示 */
+.project-management :deep(.el-button--primary.is-text.icon-btn) {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.project-management :deep(.el-button--primary.is-text.icon-btn:hover) {
+  background-color: var(--sidebar-hover) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 刪除按鈕 - 透明背景、透明邊框、灰色圖示 */
+.project-management :deep(.el-button--danger.is-text.icon-btn) {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.project-management :deep(.el-button--danger.is-text.icon-btn:hover) {
+  background-color: var(--sidebar-hover) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
 .icon-btn :deep(.el-icon) {
@@ -462,17 +518,30 @@ onMounted(() => {
   height: 16px;
 }
 
-/* 刪除按鈕圖示顏色 */
-.project-management :deep(.el-button--danger.is-text .el-icon),
-.project-management :deep(.el-button--danger.is-text svg) {
-  color: var(--text-white) !important;
-  fill: var(--text-white) !important;
+/* 編輯按鈕圖示顏色 - 灰色 */
+.project-management :deep(.el-button--primary.is-text.icon-btn .el-icon),
+.project-management :deep(.el-button--primary.is-text.icon-btn svg) {
+  color: var(--text-secondary) !important;
+  fill: var(--text-secondary) !important;
 }
 
-.project-management :deep(.el-button--danger.is-text:hover .el-icon),
-.project-management :deep(.el-button--danger.is-text:hover svg) {
-  color: var(--text-white) !important;
-  fill: var(--text-white) !important;
+.project-management :deep(.el-button--primary.is-text.icon-btn:hover .el-icon),
+.project-management :deep(.el-button--primary.is-text.icon-btn:hover svg) {
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
+}
+
+/* 刪除按鈕圖示顏色 - 灰色 */
+.project-management :deep(.el-button--danger.is-text.icon-btn .el-icon),
+.project-management :deep(.el-button--danger.is-text.icon-btn svg) {
+  color: var(--text-secondary) !important;
+  fill: var(--text-secondary) !important;
+}
+
+.project-management :deep(.el-button--danger.is-text.icon-btn:hover .el-icon),
+.project-management :deep(.el-button--danger.is-text.icon-btn:hover svg) {
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
 }
 
 .project-management :deep(.el-button--primary) {

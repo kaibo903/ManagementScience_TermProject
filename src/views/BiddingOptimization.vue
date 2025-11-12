@@ -624,22 +624,23 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 26px;
-  font-weight: 400;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  margin: 0 0 8px 0;
+  margin: 0 0 var(--spacing-sm) 0;
   padding: 0;
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
   line-height: 1.4;
 }
 
 .page-subtitle {
-  font-size: 15px;
+  font-size: var(--font-size-md);
   color: var(--text-secondary);
   margin: 0;
   padding: 0;
-  line-height: 1.7;
-  letter-spacing: 0.01em;
+  line-height: 1.6;
+  letter-spacing: 0;
+  font-weight: var(--font-weight-normal);
 }
 
 /* 主要內容區域 */
@@ -668,12 +669,12 @@ onMounted(() => {
 }
 
 .panel-title-new {
-  font-size: 20px;
-  font-weight: 400;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   margin: 0;
   padding: 0;
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
   line-height: 1.4;
 }
 
@@ -896,14 +897,14 @@ onMounted(() => {
 .results-panel {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
 }
 
 .results-content {
-  padding: 28px;
+  padding: var(--spacing-3xl);
   flex: 1;
 }
 

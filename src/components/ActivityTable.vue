@@ -746,8 +746,74 @@ onMounted(() => {
 .action-buttons-inline {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-xs);
   justify-content: center;
+  flex-wrap: nowrap;
+}
+
+/* 操作按鈕樣式 - 參照專案管理 */
+.activity-table :deep(.action-buttons-inline .icon-btn) {
+  padding: 6px !important;
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+/* 編輯按鈕 - 透明背景、透明邊框、灰色圖示 */
+.activity-table :deep(.el-button--primary.is-text.icon-btn) {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.activity-table :deep(.el-button--primary.is-text.icon-btn:hover) {
+  background-color: var(--sidebar-hover) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 刪除按鈕 - 透明背景、透明邊框、灰色圖示 */
+.activity-table :deep(.el-button--danger.is-text.icon-btn) {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.activity-table :deep(.el-button--danger.is-text.icon-btn:hover) {
+  background-color: var(--sidebar-hover) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 編輯按鈕圖示顏色 - 灰色 */
+.activity-table :deep(.el-button--primary.is-text.icon-btn .el-icon),
+.activity-table :deep(.el-button--primary.is-text.icon-btn svg) {
+  color: var(--text-secondary) !important;
+  fill: var(--text-secondary) !important;
+}
+
+.activity-table :deep(.el-button--primary.is-text.icon-btn:hover .el-icon),
+.activity-table :deep(.el-button--primary.is-text.icon-btn:hover svg) {
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
+}
+
+/* 刪除按鈕圖示顏色 - 灰色 */
+.activity-table :deep(.el-button--danger.is-text.icon-btn .el-icon),
+.activity-table :deep(.el-button--danger.is-text.icon-btn svg) {
+  color: var(--text-secondary) !important;
+  fill: var(--text-secondary) !important;
+}
+
+.activity-table :deep(.el-button--danger.is-text.icon-btn:hover .el-icon),
+.activity-table :deep(.el-button--danger.is-text.icon-btn:hover svg) {
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
 }
 
 .save-btn :deep(.el-icon),
@@ -761,54 +827,69 @@ onMounted(() => {
   height: 16px;
 }
 
-/* 現代專業風格表格 */
+.icon-btn :deep(.el-icon) {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.icon-btn :deep(svg) {
+  width: 16px;
+  height: 16px;
+}
+
+/* 統一表格樣式 - 參照專案管理表格 */
 .activity-table :deep(.activity-data-table) {
-  border: none;
+  background-color: var(--card-bg);
   border-radius: 0;
+  border: none;
   overflow: hidden;
 }
 
 .activity-table :deep(.activity-data-table .el-table__header-wrapper) {
-  background-color: var(--card-bg);
+  background-color: #F9FAFB;
 }
 
 .activity-table :deep(.activity-data-table th) {
   background-color: #F9FAFB;
   color: var(--text-primary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   border-bottom: 2px solid var(--border-color);
-  padding: var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md);
   letter-spacing: 0;
   text-align: center;
   white-space: nowrap;
 }
 
+.activity-table :deep(.activity-data-table th:first-child) {
+  text-align: left;
+  padding-left: var(--spacing-xl);
+}
+
 .activity-table :deep(.activity-data-table td) {
   color: var(--text-primary);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   border-bottom: 1px solid var(--border-light);
   padding: var(--spacing-lg) var(--spacing-md);
   line-height: 1.6;
   background-color: var(--card-bg);
   text-align: center;
-  font-weight: var(--font-weight-normal);
 }
 
-.activity-table :deep(.activity-data-table th:first-child),
 .activity-table :deep(.activity-data-table td:first-child) {
   text-align: left;
-  padding-left: 20px;
+  padding-left: var(--spacing-xl);
 }
 
 .activity-table :deep(.activity-data-table td[align="right"]) {
   text-align: right;
-  padding-right: 20px;
+  padding-right: var(--spacing-xl);
 }
 
 .activity-table :deep(.activity-data-table .el-table__row:hover) {
-  background-color: #F9FAFB !important;
-  transition: background-color 0.15s ease;
+  background-color: var(--sidebar-hover) !important;
+  transition: background-color 0.2s ease;
 }
 
 .activity-table :deep(.activity-data-table .el-table--striped .el-table__body tr.el-table__row--striped td) {
@@ -818,7 +899,7 @@ onMounted(() => {
 .activity-table :deep(.activity-data-table .el-table__empty-block) {
   padding: 60px 20px;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--font-size-md);
 }
 
 .cell-text {
@@ -906,66 +987,7 @@ onMounted(() => {
   color: var(--primary-hover);
 }
 
-/* 操作按鈕 - 紅色方塊按鈕設計 */
-.activity-table :deep(.el-button--primary.is-text) {
-  background-color: #EF4444;
-  border: none;
-  color: #FFFFFF;
-  padding: 10px;
-  min-width: 40px;
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(239, 68, 68, 0.2);
-}
-
-.activity-table :deep(.el-button--primary.is-text:hover) {
-  background-color: #DC2626;
-  border: none;
-  color: #FFFFFF;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-.activity-table :deep(.el-button--primary.is-text .el-icon),
-.activity-table :deep(.el-button--primary.is-text svg) {
-  color: #FFFFFF !important;
-  fill: #FFFFFF !important;
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-}
-
-.activity-table :deep(.el-button--danger.is-text) {
-  background-color: #EF4444;
-  border: none;
-  color: #FFFFFF;
-  padding: 10px;
-  min-width: 40px;
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(239, 68, 68, 0.2);
-}
-
-.activity-table :deep(.el-button--danger.is-text:hover) {
-  background-color: #DC2626;
-  border: none;
-  color: #FFFFFF;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-.activity-table :deep(.el-button--danger.is-text .el-icon),
-.activity-table :deep(.el-button--danger.is-text svg) {
-  color: #FFFFFF !important;
-  fill: #FFFFFF !important;
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-}
+/* 舊的按鈕樣式已移除，使用上方統一的樣式 */
 
 /* 保存和取消按鈕 */
 .activity-table :deep(.save-btn) {
