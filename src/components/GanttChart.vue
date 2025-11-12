@@ -111,6 +111,13 @@ const formatCurrency = (value) => {
 <style scoped>
 .gantt-chart {
   width: 100%;
+  min-height: 400px;
+}
+
+/* 圖表容器樣式 */
+.gantt-chart :deep(.echarts) {
+  width: 100% !important;
+  height: 100% !important;
 }
 </style>
 

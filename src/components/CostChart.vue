@@ -103,6 +103,13 @@ const formatCurrency = (value) => {
 <style scoped>
 .cost-chart {
   width: 100%;
+  min-height: 400px;
+}
+
+/* 圖表容器樣式 */
+.cost-chart :deep(.echarts) {
+  width: 100% !important;
+  height: 100% !important;
 }
 </style>
 

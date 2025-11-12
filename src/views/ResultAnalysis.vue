@@ -6,89 +6,109 @@
       <el-breadcrumb-item>結果分析</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <el-card v-loading="loading">
-      <template #header>
-        <div class="card-header">
-          <span>優化結果分析</span>
-          <div>
-            <el-button @click="exportPDF" :loading="exportingPDF">
-              <el-icon><Document /></el-icon>
-              匯出 PDF
-            </el-button>
-            <el-button @click="exportExcel" :loading="exportingExcel">
-              <el-icon><Document /></el-icon>
-              匯出 Excel
-            </el-button>
+    <!-- 頁面標題和匯出按鈕 -->
+    <div class="page-header-bar">
+      <h1 class="page-title">優化結果分析</h1>
+      <div class="export-buttons">
+        <el-button 
+          type="primary" 
+          @click="exportPDF" 
+          :loading="exportingPDF"
+          class="export-btn"
+        >
+          <el-icon><Document /></el-icon>
+          匯出 PDF
+        </el-button>
+        <el-button 
+          type="success" 
+          @click="exportExcel" 
+          :loading="exportingExcel"
+          class="export-btn"
+        >
+          <el-icon><Document /></el-icon>
+          匯出 Excel
+        </el-button>
+      </div>
+    </div>
+
+    <div v-loading="loading" class="content-container">
+      <div v-if="result">
+        <!-- 結果摘要卡片 -->
+        <div class="summary-card">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-label">最優工期</div>
+              <div class="summary-value">{{ result.optimal_duration }} 天</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">最優成本</div>
+              <div class="summary-value">{{ formatCurrency(result.optimal_cost) }}</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">違約金</div>
+              <div class="summary-value">{{ formatCurrency(result.penalty_amount) }}</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">獎金</div>
+              <div class="summary-value">{{ formatCurrency(result.bonus_amount) }}</div>
+            </div>
+            <div class="summary-item total-item">
+              <div class="summary-label">總成本（含獎懲）</div>
+              <div class="summary-value total-value">{{ formatCurrency(result.total_cost) }}</div>
+            </div>
           </div>
         </div>
-      </template>
 
-      <div v-if="result">
-        <!-- 結果摘要 -->
-        <el-descriptions :column="2" border style="margin-bottom: 20px;">
-          <el-descriptions-item label="最優工期">
-            {{ result.optimal_duration }} 天
-          </el-descriptions-item>
-          <el-descriptions-item label="最優成本">
-            {{ formatCurrency(result.optimal_cost) }}
-          </el-descriptions-item>
-          <el-descriptions-item label="違約金">
-            {{ formatCurrency(result.penalty_amount) }}
-          </el-descriptions-item>
-          <el-descriptions-item label="獎金">
-            {{ formatCurrency(result.bonus_amount) }}
-          </el-descriptions-item>
-          <el-descriptions-item label="總成本（含獎懲）" :span="2">
-            <strong style="font-size: 20px; color: var(--primary); font-weight: 600;">
-              {{ formatCurrency(result.total_cost) }}
-            </strong>
-          </el-descriptions-item>
-        </el-descriptions>
+        <!-- 甘特圖卡片 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">作業排程甘特圖</h2>
+          </div>
+          <div class="chart-content">
+            <GanttChart :schedules="result.schedules" />
+          </div>
+        </div>
 
-        <!-- 甘特圖 -->
-        <el-card style="margin-bottom: 20px;">
-          <template #header>
-            <span>作業排程甘特圖</span>
-          </template>
-          <GanttChart :schedules="result.schedules" />
-        </el-card>
+        <!-- 成本分析圖表卡片 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">成本分析</h2>
+          </div>
+          <div class="chart-content">
+            <CostChart :schedules="result.schedules" />
+          </div>
+        </div>
 
-        <!-- 成本分析圖表 -->
-        <el-card style="margin-bottom: 20px;">
-          <template #header>
-            <span>成本分析</span>
-          </template>
-          <CostChart :schedules="result.schedules" />
-        </el-card>
-
-        <!-- 作業排程表 -->
-        <el-card>
-          <template #header>
-            <span>作業排程明細</span>
-          </template>
-          <el-table :data="result.schedules" stripe border>
-            <el-table-column prop="activity_name" label="作業名稱" width="200" />
-            <el-table-column prop="start_time" label="開始時間（天）" width="120" align="center" />
-            <el-table-column prop="end_time" label="結束時間（天）" width="120" align="center" />
-            <el-table-column prop="duration" label="工期（天）" width="100" align="center" />
-            <el-table-column prop="is_crashed" label="是否趕工" width="100" align="center">
-              <template #default="{ row }">
-                <el-tag :type="row.is_crashed ? 'warning' : 'success'">
-                  {{ row.is_crashed ? '是' : '否' }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="cost" label="成本" align="right">
-              <template #default="{ row }">
-                {{ formatCurrency(row.cost) }}
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
+        <!-- 作業排程明細表格 -->
+        <div class="table-card">
+          <div class="table-header">
+            <h2 class="table-title">作業排程明細</h2>
+          </div>
+          <div class="table-content">
+            <el-table :data="result.schedules" stripe border class="schedule-table">
+              <el-table-column prop="activity_name" label="作業名稱" width="200" />
+              <el-table-column prop="start_time" label="開始時間（天）" width="120" align="center" />
+              <el-table-column prop="end_time" label="結束時間（天）" width="120" align="center" />
+              <el-table-column prop="duration" label="工期（天）" width="100" align="center" />
+              <el-table-column prop="is_crashed" label="是否趕工" width="120" align="center">
+                <template #default="{ row }">
+                  <el-tag :type="row.is_crashed ? 'warning' : 'success'" class="status-tag">
+                    {{ row.is_crashed ? '是' : '否' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="cost" label="成本" align="right">
+                <template #default="{ row }">
+                  <span class="cost-text">{{ formatCurrency(row.cost) }}</span>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
       </div>
 
-      <el-empty v-else description="沒有找到優化結果" />
-    </el-card>
+      <el-empty v-else description="沒有找到優化結果" class="empty-state" />
+    </div>
   </div>
 </template>
 
@@ -181,73 +201,205 @@ onMounted(() => {
 <style scoped>
 .result-analysis {
   width: 100%;
-  height: 100%;
-  box-sizing: border-box;
+  padding: 24px 32px;
+  background-color: var(--content-bg);
+  min-height: calc(100vh - 64px);
 }
 
 .breadcrumb {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-size: 14px;
+  color: var(--text-secondary);
 }
 
-.card-header {
+/* 頁面標題欄 */
+.page-header-bar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.export-btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.export-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 結果摘要卡片 */
+.summary-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-item.total-item {
+  grid-column: 1 / -1;
+  padding-top: 20px;
+  border-top: 2px solid #E5E7EB;
+}
+
+.summary-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6B7280;
+  letter-spacing: 0;
+}
+
+.summary-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1F2937;
+  letter-spacing: 0;
+}
+
+.summary-value.total-value {
+  font-size: 28px;
+  color: #EF4444;
+}
+
+/* 圖表卡片 */
+.chart-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.chart-header {
+  padding: 16px 20px;
+  background-color: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.chart-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #1F2937;
+  margin: 0;
+  letter-spacing: 0;
 }
 
-/* 簡約風格卡片 */
-.result-analysis :deep(.el-card) {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow);
-  margin-bottom: 24px;
+.chart-content {
+  padding: 24px;
+  min-height: 400px;
 }
 
-.result-analysis :deep(.el-card__header) {
-  background-color: var(--card-bg);
-  border-bottom: 1px solid var(--border-light);
-}
-
-/* 描述列表樣式 */
-.result-analysis :deep(.el-descriptions) {
-  background-color: var(--card-bg);
+/* 表格卡片 */
+.table-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
   border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.result-analysis :deep(.el-descriptions__label) {
-  color: var(--text-secondary);
+.table-header {
+  padding: 16px 20px;
+  background-color: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.table-title {
+  font-size: 16px;
   font-weight: 600;
-  background-color: #F8F9FA;
+  color: #1F2937;
+  margin: 0;
+  letter-spacing: 0;
 }
 
-.result-analysis :deep(.el-descriptions__content) {
-  color: var(--text-primary);
-  font-weight: 400;
+.table-content {
+  padding: 0;
 }
 
 /* 表格樣式 */
-.result-analysis :deep(.el-table) {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  overflow: hidden;
+.result-analysis :deep(.schedule-table) {
+  border: none;
+  border-radius: 0;
 }
 
-.result-analysis :deep(.el-table th) {
-  background-color: #F8F9FA;
-  color: var(--text-primary);
+.result-analysis :deep(.schedule-table th) {
+  background-color: #F9FAFB;
+  color: #374151;
   font-weight: 600;
+  font-size: 13px;
+  border-bottom: 2px solid #E5E7EB;
+  padding: 14px 12px;
+  letter-spacing: 0;
 }
 
-.result-analysis :deep(.el-table td) {
-  color: var(--text-primary);
+.result-analysis :deep(.schedule-table td) {
+  color: #1F2937;
+  font-size: 13px;
+  border-bottom: 1px solid #F3F4F6;
+  padding: 16px 12px;
+  background-color: #FFFFFF;
 }
 
-.result-analysis :deep(.el-table__row:hover) {
-  background-color: #F5F7FA !important;
+.result-analysis :deep(.schedule-table .el-table__row:hover) {
+  background-color: #F9FAFB !important;
+  transition: background-color 0.15s ease;
+}
+
+.status-tag {
+  border-radius: 4px;
+  font-weight: 500;
+  padding: 4px 12px;
+}
+
+.cost-text {
+  font-weight: 500;
+  color: #1F2937;
+}
+
+/* 空狀態 */
+.empty-state {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 60px 20px;
 }
 </style>
 
