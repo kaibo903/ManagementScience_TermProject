@@ -607,17 +607,19 @@ onMounted(() => {
   height: 100%;
   box-sizing: border-box;
   background-color: var(--content-bg);
+  padding: var(--spacing-3xl);
 }
 
 .breadcrumb {
-  margin-bottom: 16px;
-  font-size: 14px;
+  margin-bottom: var(--spacing-xl);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
 }
 
 /* 頁面標題 */
 .page-header {
-  margin-bottom: 40px;
-  padding-bottom: 24px;
+  margin-bottom: var(--spacing-3xl);
+  padding-bottom: var(--spacing-2xl);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -652,14 +654,14 @@ onMounted(() => {
 .settings-panel {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
 }
 
 .panel-header-new {
-  padding: 24px 28px;
+  padding: var(--spacing-2xl) var(--spacing-3xl);
   border-bottom: 1px solid var(--border-color);
   background: var(--card-bg);
   flex-shrink: 0;
@@ -677,7 +679,7 @@ onMounted(() => {
 
 /* 表單樣式 */
 .optimization-form-new {
-  padding: 28px;
+  padding: var(--spacing-3xl);
 }
 
 .form-block {
@@ -689,13 +691,13 @@ onMounted(() => {
 }
 
 .block-title {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
-  margin-bottom: 24px;
-  padding-bottom: 12px;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -725,12 +727,12 @@ onMounted(() => {
 .item-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 400;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
   color: var(--text-primary);
-  margin-bottom: 10px;
-  letter-spacing: 0.01em;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: 0;
 }
 
 .help-icon {

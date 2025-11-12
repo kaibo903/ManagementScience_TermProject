@@ -201,14 +201,14 @@ onMounted(() => {
 <style scoped>
 .result-analysis {
   width: 100%;
-  padding: 24px 32px;
+  padding: var(--spacing-3xl);
   background-color: var(--content-bg);
   min-height: calc(100vh - 64px);
 }
 
 .breadcrumb {
-  margin-bottom: 20px;
-  font-size: 14px;
+  margin-bottom: var(--spacing-xl);
+  font-size: var(--font-size-md);
   color: var(--text-secondary);
 }
 
@@ -217,15 +217,15 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #E5E7EB;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1F2937;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0;
   letter-spacing: 0;
 }
@@ -255,17 +255,17 @@ onMounted(() => {
 
 /* 結果摘要卡片 */
 .summary-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow);
 }
 
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: var(--spacing-xl);
 }
 
 .summary-item {
@@ -276,76 +276,76 @@ onMounted(() => {
 
 .summary-item.total-item {
   grid-column: 1 / -1;
-  padding-top: 20px;
-  border-top: 2px solid #E5E7EB;
+  padding-top: var(--spacing-xl);
+  border-top: 2px solid var(--border-color);
 }
 
 .summary-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: #6B7280;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
   letter-spacing: 0;
 }
 
 .summary-value {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1F2937;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   letter-spacing: 0;
 }
 
 .summary-value.total-value {
-  font-size: 28px;
-  color: #EF4444;
+  font-size: var(--font-size-3xl);
+  color: var(--danger);
 }
 
 /* 圖表卡片 */
 .chart-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 .chart-header {
-  padding: 16px 20px;
+  padding: var(--spacing-lg) var(--spacing-xl);
   background-color: #F9FAFB;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .chart-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1F2937;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0;
   letter-spacing: 0;
 }
 
 .chart-content {
-  padding: 24px;
+  padding: var(--spacing-2xl);
   min-height: 400px;
 }
 
 /* 表格卡片 */
 .table-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 .table-header {
-  padding: 16px 20px;
+  padding: var(--spacing-lg) var(--spacing-xl);
   background-color: #F9FAFB;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1F2937;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0;
   letter-spacing: 0;
 }
@@ -362,20 +362,20 @@ onMounted(() => {
 
 .result-analysis :deep(.schedule-table th) {
   background-color: #F9FAFB;
-  color: #374151;
-  font-weight: 600;
-  font-size: 13px;
-  border-bottom: 2px solid #E5E7EB;
-  padding: 14px 12px;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  border-bottom: 2px solid var(--border-color);
+  padding: var(--spacing-md) var(--spacing-md);
   letter-spacing: 0;
 }
 
 .result-analysis :deep(.schedule-table td) {
-  color: #1F2937;
-  font-size: 13px;
-  border-bottom: 1px solid #F3F4F6;
-  padding: 16px 12px;
-  background-color: #FFFFFF;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  border-bottom: 1px solid var(--border-light);
+  padding: var(--spacing-lg) var(--spacing-md);
+  background-color: var(--card-bg);
 }
 
 .result-analysis :deep(.schedule-table .el-table__row:hover) {

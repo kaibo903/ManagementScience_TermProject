@@ -8,29 +8,60 @@
   --header-bg: #FFFFFF;               /* 頂部欄背景 - 純白 */
   --content-bg: #FAFAFA;              /* 主內容背景 - 極淺灰 */
   --card-bg: #FFFFFF;                  /* 卡片背景 - 純白 */
-  --text-primary: #333333;            /* 主要文字 - 深灰 */
-  --text-secondary: #666666;          /* 次要文字 - 中灰 */
-  --text-light: #999999;              /* 淺色文字 */
+  --text-primary: #1F2937;            /* 主要文字 - 深灰 */
+  --text-secondary: #6B7280;          /* 次要文字 - 中灰 */
+  --text-light: #9CA3AF;              /* 淺色文字 */
   --text-white: #FFFFFF;               /* 白色文字 */
-  --border-color: #E0E0E0;            /* 邊框色 - 淺灰 */
-  --border-light: #F0F0F0;            /* 淺邊框 - 極淺灰 */
+  --border-color: #E5E7EB;            /* 邊框色 - 淺灰 */
+  --border-light: #F3F4F6;            /* 淺邊框 - 極淺灰 */
   
   /* 強調色 - 無印良品風格 */
   --primary: #C85A4F;                  /* 主色 - 無印紅（柔和磚紅色） */
   --primary-hover: #B04A3F;           /* 主色懸停 - 稍深無印紅 */
-  --success: #7A9B7A;                  /* 成功色 - 柔和綠色 */
-  --warning: #C9A882;                  /* 警告色 - 柔和橙色 */
-  --danger: #C85A4F;                   /* 危險色 - 無印紅 */
+  --success: #10B981;                  /* 成功色 - 綠色 */
+  --warning: #F59E0B;                  /* 警告色 - 橙色 */
+  --danger: #EF4444;                   /* 危險色 - 紅色 */
   
   /* 陰影 - 極輕微 */
-  --shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.02);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
   
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'Microsoft JhengHei', 'Hiragino Sans GB', sans-serif;
-  line-height: 1.8;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  /* 統一字型系統 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', 'Microsoft JhengHei', 'Hiragino Sans GB', sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  
+  /* 統一字體粗細 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  
+  /* 統一間距系統 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 32px;
+  
+  /* 統一圓角 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  
+  font-family: var(--font-family);
+  line-height: 1.6;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  letter-spacing: 0;
   
   color: var(--text-primary);
   background-color: var(--content-bg);
@@ -104,42 +135,49 @@ a:hover {
   color: var(--primary-hover);
 }
 
-/* 標題樣式 */
+/* 統一標題樣式 */
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   line-height: 1.4;
+  letter-spacing: 0;
+  margin: 0;
 }
 
 h1 {
-  font-size: 24px;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 h2 {
-  font-size: 20px;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 h3 {
-  font-size: 18px;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
 }
 
-/* 無印風格輸入框樣式 */
+/* 統一輸入框樣式 */
 input, textarea, select {
-  font-family: inherit;
-  font-size: 14px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   background-color: var(--card-bg);
-  border-radius: 0;
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
   padding: 10px 12px;
   box-shadow: none;
+  letter-spacing: 0;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: none;
+  box-shadow: 0 0 0 3px rgba(200, 90, 79, 0.1);
   background-color: var(--card-bg);
 }
 

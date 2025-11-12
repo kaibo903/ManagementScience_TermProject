@@ -281,10 +281,10 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 400;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   line-height: 1.4;
   margin: 0;
 }
@@ -300,11 +300,11 @@ onMounted(() => {
 .project-management :deep(.el-card__header) {
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
-  padding: 24px 28px;
+  padding: var(--spacing-2xl) var(--spacing-3xl);
 }
 
 .project-management :deep(.el-card__body) {
-  padding: 28px;
+  padding: var(--spacing-3xl);
 }
 
 /* 表格樣式 - 無印風格 */
@@ -365,26 +365,38 @@ onMounted(() => {
   line-height: 1.4;
 }
 
-/* 狀態標籤顏色 - 無印風格 */
+/* 統一狀態標籤樣式 */
 .project-management :deep(.status-tag.status-draft),
 .project-management :deep(.status-tag[class*="draft"]) {
-  border-color: #B0BEC5 !important;
-  background-color: #ECEFF1 !important;
-  color: #546E7A !important;
+  border-color: var(--text-light) !important;
+  background-color: #F3F4F6 !important;
+  color: var(--text-secondary) !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+  font-size: var(--font-size-sm) !important;
+  padding: 4px 12px !important;
 }
 
 .project-management :deep(.status-tag.status-active),
 .project-management :deep(.status-tag[class*="active"]) {
   border-color: var(--success) !important;
-  background-color: #E8F5E9 !important;
-  color: #2E7D32 !important;
+  background-color: #D1FAE5 !important;
+  color: #065F46 !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+  font-size: var(--font-size-sm) !important;
+  padding: 4px 12px !important;
 }
 
 .project-management :deep(.status-tag.status-completed),
 .project-management :deep(.status-tag[class*="completed"]) {
-  border-color: #64B5F6 !important;
-  background-color: #E3F2FD !important;
-  color: #1565C0 !important;
+  border-color: #3B82F6 !important;
+  background-color: #DBEAFE !important;
+  color: #1E40AF !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+  font-size: var(--font-size-sm) !important;
+  padding: 4px 12px !important;
 }
 
 .project-management :deep(.el-tag--info) {

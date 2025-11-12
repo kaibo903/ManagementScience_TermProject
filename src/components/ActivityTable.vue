@@ -617,11 +617,11 @@ onMounted(() => {
 
 /* 表格容器 */
 .table-container {
-  background-color: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 /* 表格標題欄 */
@@ -629,15 +629,15 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: var(--spacing-lg) var(--spacing-xl);
   background-color: #F9FAFB;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table-title-text {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1F2937;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   letter-spacing: 0;
   line-height: 1.4;
   margin: 0;
@@ -769,29 +769,30 @@ onMounted(() => {
 }
 
 .activity-table :deep(.activity-data-table .el-table__header-wrapper) {
-  background-color: #FFFFFF;
+  background-color: var(--card-bg);
 }
 
 .activity-table :deep(.activity-data-table th) {
   background-color: #F9FAFB;
-  color: #374151;
-  font-weight: 600;
-  font-size: 13px;
-  border-bottom: 2px solid #E5E7EB;
-  padding: 14px 12px;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  border-bottom: 2px solid var(--border-color);
+  padding: var(--spacing-md) var(--spacing-md);
   letter-spacing: 0;
   text-align: center;
   white-space: nowrap;
 }
 
 .activity-table :deep(.activity-data-table td) {
-  color: #1F2937;
-  font-size: 13px;
-  border-bottom: 1px solid #F3F4F6;
-  padding: 16px 12px;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  border-bottom: 1px solid var(--border-light);
+  padding: var(--spacing-lg) var(--spacing-md);
   line-height: 1.6;
-  background-color: #FFFFFF;
+  background-color: var(--card-bg);
   text-align: center;
+  font-weight: var(--font-weight-normal);
 }
 
 .activity-table :deep(.activity-data-table th:first-child),
@@ -822,10 +823,10 @@ onMounted(() => {
 
 .cell-text {
   display: inline-block;
-  font-size: 13px;
-  color: #1F2937;
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
   letter-spacing: 0;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
 }
 
 .unit-text {
@@ -848,10 +849,11 @@ onMounted(() => {
 }
 
 .empty-text {
-  color: #9CA3AF;
-  font-size: 13px;
+  color: var(--text-light);
+  font-size: var(--font-size-base);
   font-style: normal;
   display: inline-block;
+  font-weight: var(--font-weight-normal);
 }
 
 /* 無印風格標籤 */
