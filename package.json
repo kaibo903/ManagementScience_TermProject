@@ -1,7 +1,7 @@
 {
-  "name": "vue-supa-starter",
+  "name": "營造廠決策分析平台",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,15 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.81.1",
-    "vue": "^3.5.24"
+    "vue": "^3.5.24",
+    "vue-router": "^4.4.0",
+    "element-plus": "^2.8.0",
+    "@element-plus/icons-vue": "^2.3.1",
+    "echarts": "^5.5.0",
+    "vue-echarts": "^6.6.9",
+    "axios": "^1.7.7",
+    "jspdf": "^2.5.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",

@@ -1,78 +1,105 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { supabase } from './lib/supabase';
-
-const status = ref<'checking'|'ok'|'error'>('checking');
-const rows = ref<{ id:number; created_at:string; note:string|null }[]>([]);
-const newNote = ref('');
-const message = ref('');
-
-async function checkConnection() {
-  // 用最安全通用的方式：對 ping 表做一次輕量查詢
-  const { error } = await supabase.from('ping').select('id').limit(1);
-  if (error) {
-    status.value = 'error';
-    message.value = error.message;
-    return;
-  }
-  status.value = 'ok';
-  await loadRows();
-}
-
-async function loadRows() {
-  const { data, error } = await supabase
-    .from('ping')
-    .select('*')
-    .order('id', { ascending: false })
-    .limit(10);
-
-  if (!error && data) rows.value = data as any;
-}
-
-async function addRow() {
-  if (!newNote.value.trim()) return;
-  const { error } = await supabase.from('ping').insert({ note: newNote.value.trim() });
-  if (error) {
-    alert(error.message);
-    return;
-  }
-  newNote.value = '';
-  await loadRows();
-}
-
-onMounted(checkConnection);
-</script>
-
 <template>
-  <main style="max-width:720px;margin:40px auto;padding:24px;font-family:system-ui, sans-serif;">
-    <h1>Vue + Supabase 健康檢查</h1>
-
-    <p v-if="status==='checking'">正在檢查 Supabase 連線…</p>
-    <p v-else-if="status==='ok'">✅ 已連線成功</p>
-    <p v-else>❌ 連線失敗（{{ message }}）</p>
-
-    <section style="margin-top:24px;">
-      <h2>新增一筆測試資料</h2>
-      <div style="display:flex;gap:8px;">
-        <input v-model="newNote" placeholder="輸入 note…" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;">
-        <button @click="addRow" style="padding:8px 12px;border-radius:8px;">新增</button>
+  <el-container class="app-container">
+    <!-- 頂部導航欄 -->
+    <el-header class="app-header">
+      <div class="header-content">
+        <h1 class="app-title">營造廠決策分析平台</h1>
+        <el-menu
+          mode="horizontal"
+          :default-active="activeMenu"
+          router
+          class="header-menu"
+        >
+          <el-menu-item index="/projects">
+            <el-icon><FolderOpened /></el-icon>
+            <span>專案管理</span>
+          </el-menu-item>
+          <el-menu-item index="/optimization">
+            <el-icon><TrendCharts /></el-icon>
+            <span>投標優化</span>
+          </el-menu-item>
+        </el-menu>
       </div>
-    </section>
+    </el-header>
 
-    <section style="margin-top:24px;">
-      <h2>最近 10 筆</h2>
-      <ul>
-        <li v-for="r in rows" :key="r.id">
-          <code>#{{ r.id }}</code> — {{ r.created_at }} — {{ r.note }}
-        </li>
-      </ul>
-    </section>
-
-    <hr style="margin:24px 0;">
-    <small>本機與 Vercel 的差別通常只在環境變數與 CORS 來源。</small>
-  </main>
+    <!-- 主要內容區域 -->
+    <el-main class="app-main">
+      <router-view />
+    </el-main>
+  </el-container>
 </template>
 
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { FolderOpened, TrendCharts } from '@element-plus/icons-vue'
+
+const route = useRoute()
+
+// 計算當前啟用的選單項
+const activeMenu = computed(() => {
+  return route.path
+})
+</script>
+
+<style scoped>
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background-color: #409eff;
+  color: white;
+  padding: 0;
+  height: 60px !important;
+  display: flex;
+  align-items: center;
+}
+
+.header-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.header-menu {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.header-menu :deep(.el-menu-item) {
+  color: white;
+  border-bottom: 2px solid transparent;
+}
+
+.header-menu :deep(.el-menu-item:hover),
+.header-menu :deep(.el-menu-item.is-active) {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom-color: white;
+}
+
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f5f7fa;
+}
+</style>
+
 <style>
-html,body,#app{height:100%;margin:0}
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 </style>

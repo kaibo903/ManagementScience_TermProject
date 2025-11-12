@@ -1,0 +1,67 @@
+---
+alwaysApply: true
+---
+{
+  "project": {
+    "name": "營造廠決策分析平台",
+    "description": "本專案旨在建立以單一資料來源（SSOT）為核心的營造決策分析平台，首個模組為「投標最佳化決策系統」。"
+  },
+
+  "general_guidelines": {
+    "language": "zh-TW",
+    "style": "繁體中文",
+    "description": "所有回答、註解、說明文件與輸出均須使用繁體中文。"
+  },
+
+  "code_style": {
+    "comment_language": "zh-TW",
+    "comment_requirements": "所有程式碼必須包含清晰、完整的繁體中文註解，包含邏輯說明與變數用途，以利後續維護。",
+    "structure": "程式碼應清楚區分模組、函式與元件層級，並使用一致的命名規範（駝峰式命名）。"
+  },
+
+  "documentation": {
+    "prd_sync": {
+      "enabled": true,
+      "description": "AI 應自動建立並持續更新 PRD（產品需求文件），根據最新聊天內容動態調整。",
+      "location": "./docs/PRD.md"
+    },
+    "user_manual_sync": {
+      "enabled": true,
+      "description": "AI 應自動建立並持續更新使用者手冊，內容含操作步驟與使用情境。",
+      "location": "./docs/UserManual.md"
+    },
+    "code_map_sync": {
+      "enabled": true,
+      "description": "AI 應建立一份『功能與程式碼對應表』，標註各功能邏輯的所在檔案與模組位置，以利後續維護與更新。",
+      "location": "./docs/FeatureCodeMap.md"
+    },
+    "chat_history_sync": {
+      "enabled": true,
+      "description": "AI 應記錄開發相關聊天紀錄與決策脈絡，以便追蹤變更與文件回溯。",
+      "location": "./docs/ChatHistory.md"
+    }
+  },
+
+  "ai_behavior": {
+    "conversation_sync": "AI 應根據開發聊天自動更新上述文件內容，確保文件與程式一致。",
+    "commit_behavior": "重大文件或代碼更新時，自動生成對應 commit message（以繁體中文撰寫）。",
+    "review_mode": "在生成或修改檔案時，AI 應提供修改摘要與變更理由，以利審查。"
+  },
+
+  "quality_assurance": {
+    "require_tests": true,
+    "lint_rules": "遵循 ESLint + Prettier 標準。",
+    "test_description_language": "zh-TW"
+  },
+
+  "integration": {
+    "github": {
+      "enabled": true,
+      "description": "整合 GitHub workflow，自動提交文件更新與程式碼修改。"
+    },
+    "supabase": {
+      "enabled": true,
+      "description": "使用 Supabase 作為主要資料庫，Cursor 生成的程式碼應自動對應 Supabase schema。"
+    }
+  }
+}
