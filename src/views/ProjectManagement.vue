@@ -145,8 +145,9 @@
     <el-dialog
       v-model="showActivityDialog"
       title="作業活動管理"
-      width="90%"
+      :width="isMobile ? '95%' : '90%'"
       :close-on-click-modal="false"
+      class="activity-dialog-responsive"
     >
       <ActivityTable
         v-if="currentProject"
@@ -753,12 +754,12 @@ onBeforeUnmount(() => {
 
 @media (max-width: 768px) {
   .project-management {
-    padding: var(--spacing-xl);
+    padding: 12px;
   }
 
   .project-management :deep(.el-card__header),
   .project-management :deep(.el-card__body) {
-    padding: var(--spacing-xl);
+    padding: 12px;
   }
 
   .card-header {
@@ -776,13 +777,58 @@ onBeforeUnmount(() => {
     overflow-x: auto;
   }
 
+  .project-card {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .project-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .project-card .card-title {
+    font-size: 16px;
+    width: 100%;
+  }
+
   .project-card-actions {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
+    width: 100%;
   }
 
   .manage-btn {
     width: 100%;
+  }
+
+  .icon-action-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .project-management :deep(.el-dialog) {
+    width: 95% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .project-management :deep(.el-dialog__body) {
+    padding: 12px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .project-management :deep(.el-dialog__header) {
+    padding: 12px;
+  }
+
+  .project-management :deep(.el-dialog__footer) {
+    padding: 12px;
   }
 }
 </style>

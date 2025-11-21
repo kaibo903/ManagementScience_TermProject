@@ -1549,7 +1549,7 @@ watch(
 
 @media (max-width: 768px) {
   .activity-table {
-    padding: 16px;
+    padding: 12px;
     min-height: auto;
   }
 
@@ -1557,17 +1557,94 @@ watch(
     border: none;
     border-radius: 12px;
     box-shadow: none;
+    overflow-x: hidden;
   }
 
   .table-header-bar {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    padding: 12px 16px;
   }
 
   .add-activity-btn-header {
     width: 100%;
     justify-content: center;
+  }
+
+  .activity-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    width: 100%;
+  }
+
+  .card-actions-inline {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .card-field {
+    margin-top: 10px;
+  }
+
+  .field-label {
+    font-size: 12px;
+  }
+
+  .field-value {
+    font-size: 14px;
+  }
+
+  .mobile-activity-list :deep(.inline-input),
+  .mobile-activity-list :deep(.inline-input-number),
+  .mobile-activity-list :deep(.inline-select) {
+    width: 100%;
+  }
+
+  .mobile-activity-list :deep(.inline-input .el-input__wrapper),
+  .mobile-activity-list :deep(.inline-input-number .el-input__wrapper),
+  .mobile-activity-list :deep(.inline-select .el-input__wrapper) {
+    padding: 0 12px;
+    min-height: 44px;
+  }
+
+  .mobile-activity-list :deep(.inline-input .el-input__inner),
+  .mobile-activity-list :deep(.inline-input-number .el-input__inner),
+  .mobile-activity-list :deep(.inline-select .el-input__inner) {
+    font-size: 16px;
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  .activity-table :deep(.activity-dialog .el-dialog) {
+    width: 95% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .activity-table :deep(.activity-dialog .el-dialog__body) {
+    padding: 16px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .activity-table :deep(.activity-dialog .el-dialog__header) {
+    padding: 16px;
+  }
+
+  .activity-table :deep(.activity-dialog .el-dialog__footer) {
+    padding: 12px 16px;
   }
 }
 
