@@ -77,6 +77,36 @@ class ActivitySchedule(BaseModel):
     cost: Decimal
 
 
+class ActivityInfo(BaseModel):
+    """作業資訊模型"""
+    id: str
+    name: str
+    normal_duration: int
+    normal_cost: Decimal
+    crash_duration: int
+    crash_cost: Decimal
+
+
+class PrecedenceInfo(BaseModel):
+    """前置關係模型"""
+    successor: str
+    predecessor: str
+
+
+class OptimizationData(BaseModel):
+    """優化輸入參數模型"""
+    mode: str
+    budget_constraint: Optional[Decimal]
+    duration_constraint: Optional[int]
+    indirect_cost: Decimal
+    penalty_type: str
+    penalty_amount: Optional[Decimal]
+    penalty_rate: Optional[Decimal]
+    contract_amount: Decimal
+    contract_duration: Optional[int]
+    target_duration: Optional[int]
+
+
 class OptimizationResult(BaseModel):
     """優化結果模型"""
     scenario_id: UUID
@@ -92,4 +122,8 @@ class OptimizationResult(BaseModel):
     error_message: Optional[str]
     schedules: List[ActivitySchedule]
     created_at: datetime
+    # 新增：計算過程所需的詳細數據
+    optimization_data: Optional[OptimizationData] = None
+    activities: Optional[List[ActivityInfo]] = None
+    precedences: Optional[List[PrecedenceInfo]] = None
 

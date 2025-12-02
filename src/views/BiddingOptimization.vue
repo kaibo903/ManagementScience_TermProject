@@ -322,6 +322,44 @@
             </div>
           </div>
 
+          <!-- 結果摘要 -->
+          <div class="calculation-info-card" v-if="optimizationResult">
+            <div class="section-title-new">
+              <el-icon><InfoFilled /></el-icon>
+              <span>最佳化結果摘要</span>
+            </div>
+            <div class="calculation-info">
+              <p>
+                <strong>計算完成！</strong>
+                系統已使用
+                <strong>混合整數線性規劃（MILP）</strong>
+                求解出最佳方案。
+              </p>
+
+              <div class="formula">
+                <div>直接成本：{{ formatCurrency(optimizationResult.optimal_cost) }}</div>
+                <div>＋ 間接成本：{{ formatCurrency(optimizationResult.indirect_cost) }}</div>
+                <div>＋ 違約金：{{ formatCurrency(optimizationResult.penalty_amount) }}</div>
+                <div>− 趕工獎金：{{ formatCurrency(optimizationResult.bonus_amount) }}</div>
+                <div class="formula-total">
+                  ＝ 總成本（含獎懲）：
+                  <strong>{{ formatCurrency(optimizationResult.total_cost) }}</strong>
+                </div>
+              </div>
+
+              <p>
+                在本次結果中，系統從專案的 {{ optimizationResult.schedules?.length || 0 }} 個作業中，自動選擇
+                <strong>{{ crashedActivities.length }}</strong> 個作業進行壓縮（縮短工期、提高趕工成本），
+                並重新排程每一個作業的開始與結束時間，使得上述目標函數達到最佳值。
+              </p>
+
+              <div class="info-tip">
+                <el-icon><QuestionFilled /></el-icon>
+                <span>想了解詳細的數學模型與計算過程？請點擊下方「查看詳細結果與圖表」按鈕，在結果分析頁面中有完整的 MILP 數學推導與一步一步的計算說明。</span>
+              </div>
+            </div>
+          </div>
+
           <!-- 詳細資訊（使用摺疊面板） -->
           <el-collapse v-model="activeCollapse" class="result-collapse">
             <!-- 詳細作業排程 -->
@@ -1151,7 +1189,10 @@ onMounted(() => {
   height: 40px;
   padding: 0 32px;
   font-size: 14px;
-  border-radius: 6px;
+  border-radius: 0;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
 }
 
 /* 空狀態 */
@@ -1240,28 +1281,38 @@ onMounted(() => {
   line-height: 1.8;
 }
 
-.info-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 12px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #E5E7EB;
-}
-
-.info-content {
+.calculation-steps {
+  margin: 10px 0 8px 18px;
+  padding: 0;
   font-size: 13px;
   color: #374151;
 }
 
-.info-content p {
-  margin: 8px 0;
-  line-height: 1.6;
+.calculation-steps li {
+  margin-bottom: 4px;
 }
 
-.info-content strong {
-  color: #111827;
+.highlight-text {
+  color: #B04A3F;
   font-weight: 600;
+}
+
+.advanced-title {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.advanced-steps {
+  margin: 6px 0 8px 18px;
+  padding: 0;
+  font-size: 13px;
+  color: #374151;
+}
+
+.advanced-steps li {
+  margin-bottom: 4px;
 }
 
 .formula {
@@ -1270,24 +1321,65 @@ onMounted(() => {
   border-radius: 6px;
   font-family: 'Courier New', monospace;
   color: #1F2937;
-  margin: 10px 0 !important;
+  margin: 10px 0 4px 0;
   border-left: 3px solid #3B82F6;
+  font-size: 13px;
 }
 
-.info-example {
-  color: #6B7280;
-  font-size: 12px;
-  margin: 4px 0 !important;
-  padding-left: 12px;
+.formula-total {
+  margin-top: 6px;
 }
 
-.info-note {
-  margin-top: 12px !important;
-  padding: 10px;
-  background: #FEF3C7;
-  border-left: 3px solid #F59E0B;
-  border-radius: 4px;
-  color: #92400E;
-  font-weight: 500;
+.info-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 0;
+}
+
+.info-tip .el-icon {
+  color: #3B82F6;
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-tip span {
+  flex: 1;
+  font-size: 14px;
+  color: #1E40AF;
+  line-height: 1.6;
+}
+
+.calculation-info-card {
+  margin-bottom: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 20px;
+}
+
+.calculation-info-card .section-title-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.calculation-info-card .section-title-new .el-icon {
+  color: var(--primary);
+}
+
+.calculation-info p {
+  margin: 0 0 12px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 </style>

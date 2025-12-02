@@ -3,7 +3,14 @@
 """
 from fastapi import APIRouter, HTTPException
 from uuid import UUID
-from app.schemas.optimization import OptimizationRequest, OptimizationResult, ActivitySchedule
+from app.schemas.optimization import (
+    OptimizationRequest, 
+    OptimizationResult, 
+    ActivitySchedule,
+    ActivityInfo,
+    PrecedenceInfo,
+    OptimizationData
+)
 from app.models.bidding_optimizer import BiddingOptimizer, Activity
 from app.utils.supabase_client import supabase
 from decimal import Decimal
@@ -143,7 +150,40 @@ async def optimize(request: OptimizationRequest):
             for s in result['schedules']
         ]
         
-        # 11. 返回最佳化結果
+        # 11. 準備優化輸入參數
+        optimization_data = OptimizationData(
+            mode=request.mode,
+            budget_constraint=request.budget_constraint,
+            duration_constraint=request.duration_constraint,
+            indirect_cost=indirect_cost,
+            penalty_type=request.penalty_type,
+            penalty_amount=request.penalty_amount,
+            penalty_rate=request.penalty_rate,
+            contract_amount=contract_amount,
+            contract_duration=request.contract_duration,
+            target_duration=request.target_duration
+        )
+        
+        # 12. 準備作業資訊
+        activities_info = [
+            ActivityInfo(
+                id=act['id'],
+                name=act['name'],
+                normal_duration=act['normal_duration'],
+                normal_cost=Decimal(str(act['normal_cost'])),
+                crash_duration=act['crash_duration'],
+                crash_cost=Decimal(str(act['crash_cost']))
+            )
+            for act in activities_data
+        ]
+        
+        # 13. 準備前置關係資訊
+        precedences_info = [
+            PrecedenceInfo(successor=p[0], predecessor=p[1])
+            for p in precedences
+        ]
+        
+        # 14. 返回最佳化結果
         return OptimizationResult(
             scenario_id=UUID(scenario_id),
             result_id=UUID(result_id),
@@ -157,7 +197,10 @@ async def optimize(request: OptimizationRequest):
             status=result['status'],
             error_message=None,
             schedules=schedules,
-            created_at=datetime.now()
+            created_at=datetime.now(),
+            optimization_data=optimization_data,
+            activities=activities_info,
+            precedences=precedences_info
         )
         
     except HTTPException:
@@ -170,6 +213,14 @@ async def optimize(request: OptimizationRequest):
 async def get_optimization_result(scenario_id: UUID):
     """取得優化結果"""
     try:
+        # 取得投標情境（包含優化輸入參數）
+        scenario_response = supabase.table("bidding_scenarios").select("*").eq("id", str(scenario_id)).execute()
+        if not scenario_response.data:
+            raise HTTPException(status_code=404, detail="投標情境不存在")
+        
+        scenario_data = scenario_response.data[0]
+        project_id = scenario_data['project_id']
+        
         # 取得優化結果
         result_response = supabase.table("optimization_results").select("*").eq("scenario_id", str(scenario_id)).execute()
         if not result_response.data:
@@ -196,6 +247,45 @@ async def get_optimization_result(scenario_id: UUID):
             for s in schedules_response.data
         ]
         
+        # 取得專案的所有作業活動
+        activities_response = supabase.table("project_activities").select("*").eq("project_id", project_id).execute()
+        activities_info = [
+            ActivityInfo(
+                id=act['id'],
+                name=act['name'],
+                normal_duration=act['normal_duration'],
+                normal_cost=Decimal(str(act['normal_cost'])),
+                crash_duration=act['crash_duration'],
+                crash_cost=Decimal(str(act['crash_cost']))
+            )
+            for act in activities_response.data
+        ]
+        
+        # 取得前置關係
+        activity_ids = [act['id'] for act in activities_response.data]
+        precedences_response = supabase.table("activity_precedences").select("*").in_("activity_id", activity_ids).execute()
+        precedences_info = [
+            PrecedenceInfo(
+                successor=p['activity_id'], 
+                predecessor=p['predecessor_id']
+            )
+            for p in precedences_response.data
+        ]
+        
+        # 建立優化輸入參數
+        optimization_data = OptimizationData(
+            mode=scenario_data['mode'],
+            budget_constraint=Decimal(str(scenario_data['budget_constraint'])) if scenario_data.get('budget_constraint') else None,
+            duration_constraint=scenario_data.get('duration_constraint'),
+            indirect_cost=Decimal(str(scenario_data.get('indirect_cost', 0))),
+            penalty_type=scenario_data.get('penalty_type', 'rate'),
+            penalty_amount=Decimal(str(scenario_data['penalty_amount'])) if scenario_data.get('penalty_amount') else None,
+            penalty_rate=Decimal(str(scenario_data['penalty_rate'])) if scenario_data.get('penalty_rate') else None,
+            contract_amount=Decimal(str(scenario_data.get('contract_amount', 0))),
+            contract_duration=scenario_data.get('contract_duration'),
+            target_duration=scenario_data.get('target_duration')
+        )
+        
         return OptimizationResult(
             scenario_id=UUID(result_data['scenario_id']),
             result_id=UUID(result_id),
@@ -209,7 +299,10 @@ async def get_optimization_result(scenario_id: UUID):
             status=result_data['status'],
             error_message=result_data.get('error_message'),
             schedules=schedules,
-            created_at=datetime.fromisoformat(result_data['created_at'].replace('Z', '+00:00'))
+            created_at=datetime.fromisoformat(result_data['created_at'].replace('Z', '+00:00')),
+            optimization_data=optimization_data,
+            activities=activities_info,
+            precedences=precedences_info
         )
         
     except HTTPException:

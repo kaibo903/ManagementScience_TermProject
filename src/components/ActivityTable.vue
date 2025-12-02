@@ -5,14 +5,23 @@
       <!-- 表格標題和新增按鈕 -->
       <div class="table-header-bar">
         <h2 class="table-title-text">作業活動管理</h2>
-        <button 
-          @click="addNewRow" 
-          class="add-activity-btn-header"
-          :disabled="isAddingNew"
-        >
-          <el-icon class="add-icon"><Plus /></el-icon>
-          <span class="add-text">新增作業</span>
-        </button>
+        <div class="header-buttons">
+          <button 
+            @click="showImportDialog = true" 
+            class="import-csv-btn-header"
+          >
+            <el-icon class="add-icon"><Upload /></el-icon>
+            <span class="add-text">CSV 匯入</span>
+          </button>
+          <button 
+            @click="addNewRow" 
+            class="add-activity-btn-header"
+            :disabled="isAddingNew"
+          >
+            <el-icon class="add-icon"><Plus /></el-icon>
+            <span class="add-text">新增作業</span>
+          </button>
+        </div>
       </div>
       
       <div v-if="!isMobile">
@@ -399,6 +408,96 @@
       </div>
     </div>
 
+    <!-- CSV 匯入對話框 -->
+    <el-dialog
+      v-model="showImportDialog"
+      title="CSV 匯入作業"
+      width="600px"
+      class="import-dialog"
+      @close="handleImportDialogClose"
+    >
+      <div class="import-content">
+        <div class="import-instructions">
+          <h3>匯入說明</h3>
+          <ul>
+            <li>CSV 檔案需包含以下欄位：作業名稱、正常工期、正常成本、趕工工期、趕工成本</li>
+            <li>選填欄位：描述、前置作業（多個前置作業請用逗號分隔作業名稱）</li>
+            <li>第一行為標題列，系統會自動識別欄位名稱</li>
+            <li>支援 UTF-8 和 Big5 編碼</li>
+          </ul>
+          <el-button 
+            type="primary" 
+            text 
+            @click="downloadTemplate"
+            class="download-template-btn"
+            size="small"
+          >
+            <el-icon><Download /></el-icon>
+            下載 CSV 範本
+          </el-button>
+        </div>
+        
+        <el-upload
+          ref="uploadRef"
+          :auto-upload="false"
+          :on-change="handleFileChange"
+          :limit="1"
+          accept=".csv"
+          drag
+          class="csv-upload"
+        >
+          <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+          <div class="el-upload__text">
+            將 CSV 檔案拖到此處，或<em>點擊上傳</em>
+          </div>
+          <template #tip>
+            <div class="el-upload__tip">
+              僅支援 CSV 檔案格式
+            </div>
+          </template>
+        </el-upload>
+
+        <div v-if="importPreview.length > 0" class="import-preview">
+          <h4>預覽資料（前 5 筆）</h4>
+          <el-table :data="importPreview" border size="small" max-height="200">
+            <el-table-column prop="name" label="作業名稱" width="150" />
+            <el-table-column prop="normal_duration" label="正常工期" width="100" />
+            <el-table-column prop="normal_cost" label="正常成本" width="120" />
+            <el-table-column prop="crash_duration" label="趕工工期" width="100" />
+            <el-table-column prop="crash_cost" label="趕工成本" width="120" />
+            <el-table-column prop="predecessors" label="前置作業" />
+          </el-table>
+          <p class="preview-total">共 {{ importData.length }} 筆資料</p>
+        </div>
+
+        <div v-if="importErrors.length > 0" class="import-errors">
+          <h4>錯誤訊息</h4>
+          <el-alert
+            v-for="(error, index) in importErrors"
+            :key="index"
+            :title="error"
+            type="error"
+            :closable="false"
+            style="margin-bottom: 8px;"
+          />
+        </div>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="showImportDialog = false" class="cancel-btn">取消</el-button>
+          <el-button 
+            type="primary" 
+            @click="handleImport" 
+            :loading="importing"
+            :disabled="importData.length === 0"
+            class="submit-btn"
+          >
+            開始匯入
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 建立/編輯作業對話框 -->
     <el-dialog
       v-model="showCreateDialog"
@@ -513,7 +612,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Edit, Delete, Check, Close } from '@element-plus/icons-vue'
+import { Plus, Edit, Delete, Check, Close, Upload, Download, UploadFilled } from '@element-plus/icons-vue'
 import { activityAPI } from '../services/api'
 
 const props = defineProps({
@@ -535,6 +634,14 @@ const formRef = ref(null)
 const isAddingNew = ref(false)
 const editingRow = ref(null)
 const nameInputRef = ref(null)
+
+// CSV 匯入相關
+const showImportDialog = ref(false)
+const importData = ref([])
+const importPreview = ref([])
+const importErrors = ref([])
+const importing = ref(false)
+const uploadRef = ref(null)
 
 // 計算顯示的活動列表（包含編輯中的行）
 const displayActivities = computed(() => {
@@ -863,6 +970,274 @@ watch(
     }
   }
 )
+
+// CSV 匯入相關函數
+// 處理檔案選擇
+const handleFileChange = (file) => {
+  importErrors.value = []
+  importData.value = []
+  importPreview.value = []
+  
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    try {
+      const text = e.target.result
+      parseCSV(text)
+    } catch (error) {
+      ElMessage.error('讀取檔案失敗：' + error.message)
+      importErrors.value.push('讀取檔案失敗：' + error.message)
+    }
+  }
+  
+  // 嘗試 UTF-8 編碼
+  reader.readAsText(file.raw, 'UTF-8')
+}
+
+// 解析 CSV
+const parseCSV = (text) => {
+  try {
+    // 處理不同換行符
+    const lines = text.split(/\r?\n/).filter(line => line.trim())
+    if (lines.length < 2) {
+      throw new Error('CSV 檔案至少需要包含標題列和一行資料')
+    }
+    
+    // 解析標題列
+    const headers = parseCSVLine(lines[0])
+    const headerMap = {}
+    headers.forEach((header, index) => {
+      const normalizedHeader = header.trim().toLowerCase()
+      // 支援多種欄位名稱變體
+      if (normalizedHeader.includes('作業名稱') || normalizedHeader.includes('name') || normalizedHeader === '名稱') {
+        headerMap.name = index
+      } else if (normalizedHeader.includes('描述') || normalizedHeader.includes('description') || normalizedHeader === '說明') {
+        headerMap.description = index
+      } else if (normalizedHeader.includes('正常工期') || normalizedHeader.includes('normal_duration') || normalizedHeader === '正常天數') {
+        headerMap.normal_duration = index
+      } else if (normalizedHeader.includes('正常成本') || normalizedHeader.includes('normal_cost') || normalizedHeader === '正常費用') {
+        headerMap.normal_cost = index
+      } else if (normalizedHeader.includes('趕工工期') || normalizedHeader.includes('crash_duration') || normalizedHeader === '趕工天數') {
+        headerMap.crash_duration = index
+      } else if (normalizedHeader.includes('趕工成本') || normalizedHeader.includes('crash_cost') || normalizedHeader === '趕工費用') {
+        headerMap.crash_cost = index
+      } else if (normalizedHeader.includes('前置作業') || normalizedHeader.includes('predecessor') || normalizedHeader === '前置') {
+        headerMap.predecessors = index
+      }
+    })
+    
+    // 檢查必要欄位
+    const requiredFields = ['name', 'normal_duration', 'normal_cost', 'crash_duration', 'crash_cost']
+    const missingFields = requiredFields.filter(field => headerMap[field] === undefined)
+    if (missingFields.length > 0) {
+      throw new Error(`缺少必要欄位：${missingFields.join(', ')}`)
+    }
+    
+    // 解析資料列
+    const activities = []
+    const errors = []
+    
+    for (let i = 1; i < lines.length; i++) {
+      try {
+        const values = parseCSVLine(lines[i])
+        if (values.every(v => !v.trim())) continue // 跳過空行
+        
+        const activity = {
+          name: values[headerMap.name]?.trim() || '',
+          description: headerMap.description !== undefined ? (values[headerMap.description]?.trim() || '') : '',
+          normal_duration: parseInt(values[headerMap.normal_duration]?.trim() || '0'),
+          normal_cost: parseFloat(values[headerMap.normal_cost]?.trim().replace(/,/g, '') || '0'),
+          crash_duration: parseInt(values[headerMap.crash_duration]?.trim() || '0'),
+          crash_cost: parseFloat(values[headerMap.crash_cost]?.trim().replace(/,/g, '') || '0'),
+          predecessor_names: headerMap.predecessors !== undefined ? (values[headerMap.predecessors]?.trim() || '').split(',').map(s => s.trim()).filter(s => s) : []
+        }
+        
+        // 驗證資料
+        if (!activity.name) {
+          errors.push(`第 ${i + 1} 行：作業名稱不能為空`)
+          continue
+        }
+        if (activity.normal_duration <= 0) {
+          errors.push(`第 ${i + 1} 行：正常工期必須大於 0`)
+          continue
+        }
+        if (activity.normal_cost <= 0) {
+          errors.push(`第 ${i + 1} 行：正常成本必須大於 0`)
+          continue
+        }
+        if (activity.crash_duration <= 0) {
+          errors.push(`第 ${i + 1} 行：趕工工期必須大於 0`)
+          continue
+        }
+        if (activity.crash_cost <= 0) {
+          errors.push(`第 ${i + 1} 行：趕工成本必須大於 0`)
+          continue
+        }
+        if (activity.crash_duration > activity.normal_duration) {
+          errors.push(`第 ${i + 1} 行：趕工工期必須小於等於正常工期`)
+          continue
+        }
+        if (activity.crash_cost < activity.normal_cost) {
+          errors.push(`第 ${i + 1} 行：趕工成本必須大於等於正常成本`)
+          continue
+        }
+        
+        activities.push(activity)
+      } catch (error) {
+        errors.push(`第 ${i + 1} 行解析失敗：${error.message}`)
+      }
+    }
+    
+    if (errors.length > 0) {
+      importErrors.value = errors
+    }
+    
+    importData.value = activities
+    importPreview.value = activities.slice(0, 5).map(act => ({
+      ...act,
+      predecessors: act.predecessor_names.join(', ')
+    }))
+    
+    if (activities.length === 0) {
+      ElMessage.warning('未找到有效的作業資料')
+    } else {
+      ElMessage.success(`成功解析 ${activities.length} 筆作業資料`)
+    }
+  } catch (error) {
+    ElMessage.error('解析 CSV 失敗：' + error.message)
+    importErrors.value.push('解析 CSV 失敗：' + error.message)
+  }
+}
+
+// 解析 CSV 行（處理引號內的逗號）
+const parseCSVLine = (line) => {
+  const result = []
+  let current = ''
+  let inQuotes = false
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+    if (char === '"') {
+      inQuotes = !inQuotes
+    } else if (char === ',' && !inQuotes) {
+      result.push(current)
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  result.push(current)
+  
+  return result.map(cell => cell.replace(/^"|"$/g, ''))
+}
+
+// 下載 CSV 範本
+const downloadTemplate = () => {
+  const template = [
+    ['作業名稱', '描述', '正常工期', '正常成本', '趕工工期', '趕工成本', '前置作業'],
+    ['基礎工程', '基礎開挖與回填', '10', '500000', '7', '650000', ''],
+    ['結構工程', '鋼筋混凝土結構', '20', '2000000', '15', '2500000', '基礎工程'],
+    ['裝修工程', '室內裝修', '15', '1500000', '10', '1800000', '結構工程'],
+    ['機電工程', '水電配管', '12', '800000', '8', '1000000', '結構工程'],
+    ['驗收', '最終驗收', '5', '200000', '3', '250000', '裝修工程,機電工程']
+  ]
+  
+  const csvContent = template.map(row => 
+    row.map(cell => `"${cell}"`).join(',')
+  ).join('\n')
+  
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = '作業匯入範本.csv'
+  link.click()
+}
+
+// 處理匯入
+const handleImport = async () => {
+  if (importData.value.length === 0) {
+    ElMessage.warning('沒有可匯入的資料')
+    return
+  }
+  
+  importing.value = true
+  let successCount = 0
+  let failCount = 0
+  
+  try {
+    // 先載入現有作業，用於解析前置作業名稱
+    const existingActivities = await activityAPI.getActivities(props.projectId)
+    const nameToIdMap = new Map()
+    existingActivities.forEach(act => {
+      nameToIdMap.set(act.name, act.id)
+    })
+    
+    // 逐筆建立作業
+    for (let i = 0; i < importData.value.length; i++) {
+      const activity = importData.value[i]
+      try {
+        // 解析前置作業 ID
+        const predecessorIds = []
+        for (const predName of activity.predecessor_names) {
+          const predId = nameToIdMap.get(predName)
+          if (predId) {
+            predecessorIds.push(predId)
+          } else {
+            // 如果前置作業不存在，嘗試在已建立的作業中尋找
+            const createdActivity = importData.value
+              .slice(0, i)
+              .find(a => a.name === predName)
+            if (createdActivity && createdActivity.createdId) {
+              predecessorIds.push(createdActivity.createdId)
+            }
+          }
+        }
+        
+        // 建立作業
+        const activityData = {
+          name: activity.name,
+          description: activity.description || '',
+          normal_duration: activity.normal_duration,
+          normal_cost: activity.normal_cost,
+          crash_duration: activity.crash_duration,
+          crash_cost: activity.crash_cost,
+          predecessor_ids: predecessorIds
+        }
+        
+        const created = await activityAPI.createActivity(props.projectId, activityData)
+        activity.createdId = created.id
+        successCount++
+        
+        // 更新名稱到 ID 的映射
+        nameToIdMap.set(activity.name, created.id)
+      } catch (error) {
+        failCount++
+        importErrors.value.push(`匯入「${activity.name}」失敗：${error.message}`)
+      }
+    }
+    
+    if (successCount > 0) {
+      ElMessage.success(`成功匯入 ${successCount} 筆作業${failCount > 0 ? `，${failCount} 筆失敗` : ''}`)
+      showImportDialog.value = false
+      loadActivities()
+    } else {
+      ElMessage.error('所有作業匯入失敗')
+    }
+  } catch (error) {
+    ElMessage.error('匯入過程發生錯誤：' + error.message)
+  } finally {
+    importing.value = false
+  }
+}
+
+// 關閉匯入對話框
+const handleImportDialogClose = () => {
+  importData.value = []
+  importPreview.value = []
+  importErrors.value = []
+  if (uploadRef.value) {
+    uploadRef.value.clearFiles()
+  }
+}
 </script>
 
 <style scoped>
@@ -892,6 +1267,12 @@ watch(
   border-bottom: 1px solid var(--border-color);
 }
 
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .table-title-text {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
@@ -901,6 +1282,31 @@ watch(
   margin: 0;
 }
 
+/* CSV 匯入按鈕（標題欄） */
+.import-csv-btn-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background-color: #10B981;
+  border: none;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-radius: 0;
+  font-family: inherit;
+  box-shadow: none;
+}
+
+.import-csv-btn-header:hover {
+  background-color: #059669;
+  box-shadow: none;
+}
+
 /* 新增作業按鈕（標題欄） */
 .add-activity-btn-header {
   display: flex;
@@ -908,34 +1314,32 @@ watch(
   justify-content: center;
   gap: 8px;
   padding: 8px 20px;
-  background-color: #3B82F6;
+  background-color: var(--primary);
   border: none;
   color: #FFFFFF;
   font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 6px;
+  transition: all 0.25s ease;
+  border-radius: 0;
   font-family: inherit;
-  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.2);
+  box-shadow: none;
 }
 
 .add-activity-btn-header:hover {
-  background-color: #2563EB;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-  transform: translateY(-1px);
+  background-color: var(--primary-hover);
+  box-shadow: none;
 }
 
 .add-activity-btn-header:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .add-activity-btn-header:disabled:hover {
-  background-color: #3B82F6;
-  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.2);
+  background-color: var(--primary);
+  box-shadow: none;
 }
 
 .add-icon {
@@ -1346,6 +1750,8 @@ watch(
 /* 無印風格按鈕 */
 .activity-table :deep(.el-button) {
   border-radius: 0;
+  font-weight: 400;
+  transition: all 0.25s ease;
 }
 
 .activity-table :deep(.el-button--small) {
@@ -1369,7 +1775,7 @@ watch(
 
 /* 舊的按鈕樣式已移除，使用上方統一的樣式 */
 
-/* 保存和取消按鈕 */
+/* 保存和取消按鈕 - 與專案按鈕風格一致（無圓角、扁平化） */
 .activity-table :deep(.save-btn) {
   background-color: #10B981 !important;
   border: none !important;
@@ -1378,14 +1784,14 @@ watch(
   min-width: 40px !important;
   width: 40px !important;
   height: 40px !important;
-  border-radius: 6px !important;
-  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: all 0.25s ease;
 }
 
 .activity-table :deep(.save-btn:hover) {
   background-color: #059669 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;
+  box-shadow: none !important;
 }
 
 .activity-table :deep(.save-btn .el-icon),
@@ -1398,27 +1804,28 @@ watch(
 }
 
 .activity-table :deep(.cancel-btn) {
-  background-color: #6B7280 !important;
-  border: none !important;
-  color: #FFFFFF !important;
-  padding: 10px !important;
-  min-width: 40px !important;
-  width: 40px !important;
+  background-color: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  padding: 10px 24px !important;
+  min-width: 120px !important;
   height: 40px !important;
-  border-radius: 6px !important;
-  box-shadow: 0 1px 2px rgba(107, 114, 128, 0.2) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: all 0.25s ease;
 }
 
 .activity-table :deep(.cancel-btn:hover) {
-  background-color: #4B5563 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3) !important;
+  background-color: var(--content-bg) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  box-shadow: none !important;
 }
 
 .activity-table :deep(.cancel-btn .el-icon),
 .activity-table :deep(.cancel-btn svg) {
-  color: #FFFFFF !important;
-  fill: #FFFFFF !important;
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
   font-size: 18px;
   width: 18px;
   height: 18px;
@@ -1656,6 +2063,8 @@ watch(
   font-size: 14px;
   letter-spacing: 0.01em;
   transition: all 0.25s ease;
+  min-width: 120px;
+  height: 40px;
 }
 
 .activity-table :deep(.cancel-btn:hover) {
@@ -1672,12 +2081,105 @@ watch(
   font-size: 14px;
   letter-spacing: 0.02em;
   transition: all 0.25s ease;
+  min-width: 120px;
+  height: 40px;
 }
 
 .activity-table :deep(.submit-btn:hover) {
   background-color: var(--primary-hover);
   border-color: var(--primary-hover);
   color: var(--text-white);
+}
+
+/* CSV 匯入對話框樣式 */
+.import-content {
+  padding: 0;
+}
+
+.import-instructions {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #F9FAFB;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.import-instructions h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.import-instructions ul {
+  margin: 0 0 12px 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.import-instructions li {
+  margin-bottom: 4px;
+}
+
+.download-template-btn {
+  margin-top: 8px;
+}
+
+.csv-upload {
+  margin-bottom: 24px;
+}
+
+.import-preview {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #F9FAFB;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.import-preview h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.preview-total {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.import-errors {
+  margin-top: 24px;
+}
+
+.import-errors h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+@media (max-width: 768px) {
+  .table-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .header-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .import-csv-btn-header,
+  .add-activity-btn-header {
+    width: 100%;
+  }
 }
 </style>
 

@@ -14,6 +14,22 @@
 
 <script setup>
 import { computed } from 'vue'
+import VChart from 'vue-echarts'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { BarChart } from 'echarts/charts'
+import {
+  TooltipComponent,
+  GridComponent
+} from 'echarts/components'
+
+// 註冊必要的 ECharts 組件
+use([
+  CanvasRenderer,
+  BarChart,
+  TooltipComponent,
+  GridComponent
+])
 
 const props = defineProps({
   schedules: {
@@ -93,13 +109,35 @@ const chartOption = computed(() => {
       }
     },
     series: [
+      // 透明佔位條（開始時間偏移）
+      {
+        name: '開始偏移',
+        type: 'bar',
+        stack: 'total',
+        silent: true,
+        itemStyle: {
+          color: 'transparent',
+          borderColor: 'transparent'
+        },
+        emphasis: {
+          itemStyle: {
+            color: 'transparent',
+            borderColor: 'transparent'
+          }
+        },
+        data: schedules.map(s => s.start_time || 0),
+        barWidth: '60%'
+      },
+      // 實際作業條
       {
         name: '作業排程',
         type: 'bar',
+        stack: 'total',
         data: schedules.map((s, index) => ({
-          value: [s.start_time || 0, (s.start_time || 0) + (s.duration || 0)],
+          value: s.duration || 0,
           itemStyle: {
-            color: colors[index]
+            color: colors[index],
+            borderRadius: 0
           }
         })),
         barWidth: '60%',
@@ -111,7 +149,8 @@ const chartOption = computed(() => {
             return `${schedule.duration || 0}天`
           },
           fontSize: 11,
-          color: '#FFFFFF'
+          color: '#FFFFFF',
+          fontWeight: 'bold'
         }
       }
     ]

@@ -488,9 +488,9 @@ onBeforeUnmount(() => {
 
 /* 按鈕樣式 */
 .project-management :deep(.el-button) {
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-weight: var(--font-weight-normal);
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .project-management :deep(.el-button--small) {

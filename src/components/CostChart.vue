@@ -14,6 +14,22 @@
 
 <script setup>
 import { computed } from 'vue'
+import VChart from 'vue-echarts'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { BarChart } from 'echarts/charts'
+import {
+  TooltipComponent,
+  GridComponent
+} from 'echarts/components'
+
+// 註冊必要的 ECharts 組件
+use([
+  CanvasRenderer,
+  BarChart,
+  TooltipComponent,
+  GridComponent
+])
 
 const props = defineProps({
   schedules: {

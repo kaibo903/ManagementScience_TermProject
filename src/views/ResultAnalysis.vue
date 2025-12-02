@@ -105,6 +105,15 @@
             </el-table>
           </div>
         </div>
+
+        <!-- 最佳化計算過程說明 -->
+        <OptimizationProcess 
+          v-if="hasOptimizationData"
+          :result="result"
+          :optimization-data="result.optimization_data"
+          :activities="result.activities"
+          :precedences="result.precedences"
+        />
       </div>
 
       <el-empty v-else description="沒有找到優化結果" class="empty-state" />
@@ -113,13 +122,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Document } from '@element-plus/icons-vue'
 import { optimizationAPI } from '../services/api'
 import GanttChart from '../components/GanttChart.vue'
 import CostChart from '../components/CostChart.vue'
+import OptimizationProcess from '../components/OptimizationProcess.vue'
 import { exportToPDF } from '../utils/pdfGenerator'
 import { exportToExcel } from '../utils/excelGenerator'
 
@@ -129,6 +139,14 @@ const result = ref(null)
 const loading = ref(false)
 const exportingPDF = ref(false)
 const exportingExcel = ref(false)
+
+// 檢查是否有優化數據
+const hasOptimizationData = computed(() => {
+  return result.value && 
+         result.value.optimization_data && 
+         result.value.activities && 
+         result.value.precedences
+})
 
 // 載入優化結果
 const loadResult = async () => {
@@ -236,10 +254,12 @@ onMounted(() => {
 }
 
 .export-btn {
-  border-radius: 6px;
-  font-weight: 500;
-  padding: 10px 20px;
-  transition: all 0.2s ease;
+  border-radius: 0;
+  font-weight: 400;
+  padding: 10px 24px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
 }
 
 .export-btn:hover {
@@ -384,8 +404,8 @@ onMounted(() => {
 }
 
 .status-tag {
-  border-radius: 4px;
-  font-weight: 500;
+  border-radius: 0;
+  font-weight: 400;
   padding: 4px 12px;
 }
 

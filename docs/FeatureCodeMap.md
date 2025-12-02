@@ -57,6 +57,8 @@
 | 手機版作業卡片 | `src/components/ActivityTable.vue` (mobile-activity-list) | - | 小螢幕改用卡片式呈現並支援編輯 |
 | 作業列表欄位顯示 | `src/components/ActivityTable.vue` (table columns) | - | 顯示正常/趕工工期與成本欄位 |
 | 建立作業 | `src/components/ActivityTable.vue` (saveActivity) | `backend/app/api/activities.py` (create_activity) | 建立新作業 |
+| CSV 批次匯入作業 | `src/components/ActivityTable.vue` (handleImport) | `backend/app/api/activities.py` (create_activity) | 從 CSV 檔案批次建立作業 |
+| CSV 模板下載 | `src/components/ActivityTable.vue` (downloadTemplate) | - | 下載作業匯入 CSV 範本 |
 | 更新作業 | `src/components/ActivityTable.vue` (editActivity) | `backend/app/api/activities.py` (update_activity) | 更新作業資訊 |
 | 刪除作業 | `src/components/ActivityTable.vue` (deleteActivity) | `backend/app/api/activities.py` (delete_activity) | 刪除作業 |
 | 作業資料驗證 | `src/components/ActivityTable.vue` (rules) | `backend/app/schemas/activity.py` | 前後端驗證 |
@@ -100,8 +102,9 @@
 
 | 功能 | 前端檔案 | 後端檔案 | 說明 |
 |------|---------|---------|------|
-| 執行優化 | `src/views/BiddingOptimization.vue` (runOptimization) | `backend/app/api/optimization.py` (optimize) | 執行優化計算 |
-| 取得結果 | `src/views/ResultAnalysis.vue` (loadResult) | `backend/app/api/optimization.py` (get_optimization_result) | 取得優化結果 |
+| 執行優化 | `src/views/BiddingOptimization.vue` (runOptimization) | `backend/app/api/optimization.py` (optimize) | 執行優化計算並回傳結果與詳細數據 |
+| 取得結果 | `src/views/ResultAnalysis.vue` (loadResult) | `backend/app/api/optimization.py` (get_optimization_result) | 取得優化結果及計算過程數據 |
+| 優化數據模型 | - | `backend/app/schemas/optimization.py` (OptimizationData, ActivityInfo, PrecedenceInfo) | 定義優化輸入參數、作業資訊、前置關係的數據結構 |
 
 #### 3.4 獎懲條款計算
 
@@ -119,6 +122,7 @@
 |------|---------|------|
 | 結果摘要 | `src/views/ResultAnalysis.vue` | 顯示最優工期、成本、獎懲 |
 | 作業排程表 | `src/views/ResultAnalysis.vue` | 詳細的作業排程資訊 |
+| 最佳化計算過程說明 | `src/components/OptimizationProcess.vue` | 詳細的 MILP 數學模型與計算流程 |
 
 #### 4.2 圖表視覺化
 
@@ -133,6 +137,16 @@
 |------|------|------|
 | 甘特圖資料準備 | `src/components/GanttChart.vue` (chartOption) | 準備甘特圖資料 |
 | 成本圖資料準備 | `src/components/CostChart.vue` (chartOption) | 準備成本分析資料 |
+
+#### 4.4 最佳化計算過程展示
+
+| 功能 | 前端檔案 | 後端檔案 | 說明 |
+|------|---------|---------|------|
+| MILP 數學模型 | `src/components/OptimizationProcess.vue` | `backend/app/models/bidding_optimizer.py` | 顯示完整的決策變數、目標函數、限制式 |
+| 求解流程說明 | `src/components/OptimizationProcess.vue` | - | 一步一步展示從建模到求解的過程 |
+| 最優解詳細結果 | `src/components/OptimizationProcess.vue` | - | 顯示所有決策變數的最優值 |
+| 成本計算明細 | `src/components/OptimizationProcess.vue` | - | 具體數字的成本計算步驟 |
+| 優化數據傳遞 | `src/views/ResultAnalysis.vue` | `backend/app/api/optimization.py` | 從後端取得並傳遞優化詳細數據 |
 
 ### 5. 報告輸出
 
